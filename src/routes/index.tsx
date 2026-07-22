@@ -26,13 +26,13 @@ import catPest from "@/assets/cat-pest.jpg";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "UrbanHelp Kolkata — Home Services at Your Doorstep" },
+      { title: "All in One Kolkata — Home Services at Your Doorstep" },
       {
         name: "description",
         content:
           "Book trusted salon, massage, cleaning, AC repair, plumbing and electrician services at home in Kolkata. Verified professionals, upfront prices, on-time service.",
       },
-      { property: "og:title", content: "UrbanHelp Kolkata — Home Services at Your Doorstep" },
+      { property: "og:title", content: "All in One Kolkata — Home Services at Your Doorstep" },
       {
         property: "og:description",
         content:
@@ -171,7 +171,7 @@ function Header() {
           <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
             <Sparkles className="h-5 w-5" />
           </div>
-          <span className="text-lg font-semibold tracking-tight">UrbanHelp</span>
+          <span className="text-lg font-semibold tracking-tight">All in One</span>
         </a>
 
         <button className="hidden items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground hover:border-foreground/40 md:inline-flex">
