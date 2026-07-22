@@ -29,7 +29,7 @@ export const Route = createFileRoute("/")({
       {
         property: "og:description",
         content:
-          "Salon at home, massage, cleaning, appliance repair and more. Trusted professionals near you.",
+          "Book trusted salon, massage, cleaning, AC repair, plumbing and electrician services at home. Verified professionals, upfront prices, on-time service.",
       },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },

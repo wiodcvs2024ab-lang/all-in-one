@@ -81,14 +81,18 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "All in One — Home Services at Your Doorstep" },
+      { name: "description", content: "Book trusted salon, massage, cleaning, AC repair, plumbing and electrician services at home. Verified professionals, upfront prices, on-time service." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "All in One — Home Services at Your Doorstep" },
+      { property: "og:description", content: "Book trusted salon, massage, cleaning, AC repair, plumbing and electrician services at home. Verified professionals, upfront prices, on-time service." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary_large_image" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "All in One — Home Services at Your Doorstep" },
+      { name: "twitter:description", content: "Book trusted salon, massage, cleaning, AC repair, plumbing and electrician services at home. Verified professionals, upfront prices, on-time service." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4de4fb38-3752-4a12-97f8-929552014b1a/id-preview-73f4727b--a3123a6e-24e5-4f61-ac01-002909eea500.lovable.app-1784710216873.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/4de4fb38-3752-4a12-97f8-929552014b1a/id-preview-73f4727b--a3123a6e-24e5-4f61-ac01-002909eea500.lovable.app-1784710216873.png" },
     ],
     links: [
       {
