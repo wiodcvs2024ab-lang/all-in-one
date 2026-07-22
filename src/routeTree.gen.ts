@@ -9,7 +9,6 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as ServicesRouteImport } from './routes/services'
 import { Route as ProsRouteImport } from './routes/pros'
 import { Route as HelpRouteImport } from './routes/help'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -18,16 +17,12 @@ import { Route as AuthRouteImport } from './routes/auth'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ServicesCategoryRouteImport } from './routes/services.$category'
 import { Route as ServiceIdRouteImport } from './routes/service.$id'
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
 
-const ServicesRoute = ServicesRouteImport.update({
-  id: '/services',
-  path: '/services',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ProsRoute = ProsRouteImport.update({
   id: '/pros',
   path: '/pros',
@@ -67,10 +62,15 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ServicesIndexRoute = ServicesIndexRouteImport.update({
+  id: '/services/',
+  path: '/services/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServicesCategoryRoute = ServicesCategoryRouteImport.update({
-  id: '/$category',
-  path: '/$category',
-  getParentRoute: () => ServicesRoute,
+  id: '/services/$category',
+  path: '/services/$category',
+  getParentRoute: () => rootRouteImport,
 } as any)
 const ServiceIdRoute = ServiceIdRouteImport.update({
   id: '/service/$id',
@@ -96,11 +96,11 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/help': typeof HelpRoute
   '/pros': typeof ProsRoute
-  '/services': typeof ServicesRouteWithChildren
   '/bookings': typeof AuthenticatedBookingsRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/service/$id': typeof ServiceIdRoute
   '/services/$category': typeof ServicesCategoryRoute
+  '/services/': typeof ServicesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -110,11 +110,11 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/help': typeof HelpRoute
   '/pros': typeof ProsRoute
-  '/services': typeof ServicesRouteWithChildren
   '/bookings': typeof AuthenticatedBookingsRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/service/$id': typeof ServiceIdRoute
   '/services/$category': typeof ServicesCategoryRoute
+  '/services': typeof ServicesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -126,11 +126,11 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/help': typeof HelpRoute
   '/pros': typeof ProsRoute
-  '/services': typeof ServicesRouteWithChildren
   '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/service/$id': typeof ServiceIdRoute
   '/services/$category': typeof ServicesCategoryRoute
+  '/services/': typeof ServicesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -142,11 +142,11 @@ export interface FileRouteTypes {
     | '/contact'
     | '/help'
     | '/pros'
-    | '/services'
     | '/bookings'
     | '/checkout'
     | '/service/$id'
     | '/services/$category'
+    | '/services/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -156,11 +156,11 @@ export interface FileRouteTypes {
     | '/contact'
     | '/help'
     | '/pros'
-    | '/services'
     | '/bookings'
     | '/checkout'
     | '/service/$id'
     | '/services/$category'
+    | '/services'
   id:
     | '__root__'
     | '/'
@@ -171,11 +171,11 @@ export interface FileRouteTypes {
     | '/contact'
     | '/help'
     | '/pros'
-    | '/services'
     | '/_authenticated/bookings'
     | '/_authenticated/checkout'
     | '/service/$id'
     | '/services/$category'
+    | '/services/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -187,19 +187,13 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   HelpRoute: typeof HelpRoute
   ProsRoute: typeof ProsRoute
-  ServicesRoute: typeof ServicesRouteWithChildren
   ServiceIdRoute: typeof ServiceIdRoute
+  ServicesCategoryRoute: typeof ServicesCategoryRoute
+  ServicesIndexRoute: typeof ServicesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/services': {
-      id: '/services'
-      path: '/services'
-      fullPath: '/services'
-      preLoaderRoute: typeof ServicesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/pros': {
       id: '/pros'
       path: '/pros'
@@ -256,12 +250,19 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/services/': {
+      id: '/services/'
+      path: '/services'
+      fullPath: '/services/'
+      preLoaderRoute: typeof ServicesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/services/$category': {
       id: '/services/$category'
-      path: '/$category'
+      path: '/services/$category'
       fullPath: '/services/$category'
       preLoaderRoute: typeof ServicesCategoryRouteImport
-      parentRoute: typeof ServicesRoute
+      parentRoute: typeof rootRouteImport
     }
     '/service/$id': {
       id: '/service/$id'
@@ -300,18 +301,6 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
 const AuthenticatedRouteRouteWithChildren =
   AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
-interface ServicesRouteChildren {
-  ServicesCategoryRoute: typeof ServicesCategoryRoute
-}
-
-const ServicesRouteChildren: ServicesRouteChildren = {
-  ServicesCategoryRoute: ServicesCategoryRoute,
-}
-
-const ServicesRouteWithChildren = ServicesRoute._addFileChildren(
-  ServicesRouteChildren,
-)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
@@ -321,8 +310,9 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   HelpRoute: HelpRoute,
   ProsRoute: ProsRoute,
-  ServicesRoute: ServicesRouteWithChildren,
   ServiceIdRoute: ServiceIdRoute,
+  ServicesCategoryRoute: ServicesCategoryRoute,
+  ServicesIndexRoute: ServicesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

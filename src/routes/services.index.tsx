@@ -5,7 +5,7 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { Search, ChevronRight } from "lucide-react";
 import { useState, useMemo } from "react";
 
-export const Route = createFileRoute("/services")({
+export const Route = createFileRoute("/services/")({
   validateSearch: (s: Record<string, unknown>) => ({
     q: typeof s.q === "string" ? s.q : "",
   }),
@@ -21,7 +21,7 @@ export const Route = createFileRoute("/services")({
 });
 
 function ServicesPage() {
-  const { q: initialQ } = useSearch({ from: "/services" });
+  const { q: initialQ } = useSearch({ from: "/services/" });
   const [q, setQ] = useState(initialQ ?? "");
 
   const cats = useQuery({
