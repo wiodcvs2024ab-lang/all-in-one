@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { useMemo, useState, type FormEvent } from "react";
+import { toast } from "sonner";
 import {
   Search,
   MapPin,
@@ -148,22 +150,125 @@ const testimonials = [
   },
 ];
 
+const cities = ["Kolkata", "Delhi NCR", "Mumbai", "Bengaluru", "Hyderabad", "Hyderabad"];
+
+function scrollToId(id: string) {
+  const el = document.getElementById(id);
+  if (el) el.scrollIntoView({ behavior: "smooth", block: "start" });
+}
+
 function Index() {
+  const [city, setCity] = useState("Kolkata");
+  const [query, setQuery] = useState("");
+  const [cart, setCart] = useState<string[]>([]);
+
+  const cartCount = cart.length;
+
+  function handleSearch(e?: FormEvent) {
+    e?.preventDefault();
+    const q = query.trim();
+    if (!q) {
+      toast.info("Type what you're looking for", { description: "e.g. 'AC service' or 'facial'" });
+      return;
+    }
+    toast.success(`Searching for "${q}" in ${city}`);
+    scrollToId("categories");
+  }
+
+  function handleChip(chip: string) {
+    setQuery(chip);
+    toast.success(`Showing results for "${chip}"`);
+    scrollToId("popular");
+  }
+
+  function handleCategory(name: string) {
+    toast.success(`Opening ${name}`);
+    scrollToId("popular");
+  }
+
+  function handleAdd(name: string) {
+    setCart((c) => [...c, name]);
+    toast.success("Added to cart", { description: name });
+  }
+
+  function handleCartOpen() {
+    if (cartCount === 0) {
+      toast.info("Your cart is empty", { description: "Add a service to get started." });
+      return;
+    }
+    toast.message(`${cartCount} item${cartCount > 1 ? "s" : ""} in cart`, {
+      description: cart.slice(-3).join(", "),
+    });
+  }
+
+  function handleLogin() {
+    toast.info("Login coming soon", { description: "Enable authentication to activate this." });
+  }
+
+  function handleCityChange() {
+    const next = cities[(cities.indexOf(city) + 1) % cities.length];
+    setCity(next);
+    toast.success(`Location set to ${next}`);
+  }
+
+  function handleAppDownload(store: "App Store" | "Google Play") {
+    toast.info(`${store} link coming soon`);
+  }
+
+  function handleFooterLink(label: string) {
+    toast.message(label, { description: "This page hasn't been built yet." });
+  }
+
   return (
     <div className="min-h-screen bg-background text-foreground">
-      <Header />
-      <Hero />
-      <CategoryGrid />
-      <PopularServices />
+      <Header
+        city={city}
+        cartCount={cartCount}
+        query={query}
+        setQuery={setQuery}
+        onSearch={handleSearch}
+        onCartOpen={handleCartOpen}
+        onLogin={handleLogin}
+        onCityChange={handleCityChange}
+      />
+      <Hero
+        city={city}
+        query={query}
+        setQuery={setQuery}
+        onSearch={handleSearch}
+        onChip={handleChip}
+      />
+      <CategoryGrid onCategory={handleCategory} />
+      <PopularServices onAdd={handleAdd} />
       <TrustStrip />
       <Testimonials />
-      <AppCta />
-      <Footer />
+      <AppCta onDownload={handleAppDownload} />
+      <Footer onLink={handleFooterLink} />
     </div>
   );
 }
 
-function Header() {
+type HeaderProps = {
+  city: string;
+  cartCount: number;
+  query: string;
+  setQuery: (v: string) => void;
+  onSearch: (e?: FormEvent) => void;
+  onCartOpen: () => void;
+  onLogin: () => void;
+  onCityChange: () => void;
+};
+
+function Header({
+  city,
+  cartCount,
+  query,
+  setQuery,
+  onSearch,
+  onCartOpen,
+  onLogin,
+  onCityChange,
+}: HeaderProps) {
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/90 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center gap-6 px-4 sm:px-6 lg:px-8">
@@ -174,27 +279,49 @@ function Header() {
           <span className="text-lg font-semibold tracking-tight">All in One</span>
         </a>
 
-        <button className="hidden items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground hover:border-foreground/40 md:inline-flex">
+        <button
+          type="button"
+          onClick={onCityChange}
+          className="hidden items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm text-muted-foreground hover:border-foreground/40 md:inline-flex"
+        >
           <MapPin className="h-4 w-4" />
-          Kolkata
+          {city}
           <ChevronRight className="h-4 w-4 rotate-90" />
         </button>
 
-        <div className="ml-auto hidden flex-1 max-w-md items-center gap-2 rounded-full border border-border bg-secondary px-4 py-2 md:flex">
+        <form
+          onSubmit={onSearch}
+          className="ml-auto hidden max-w-md flex-1 items-center gap-2 rounded-full border border-border bg-secondary px-4 py-2 md:flex"
+        >
           <Search className="h-4 w-4 text-muted-foreground" />
           <input
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
             className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground"
             placeholder="Search for 'AC service'"
           />
-        </div>
+        </form>
 
         <nav className="ml-auto flex items-center gap-2 md:ml-0">
-          <button className="hidden text-sm font-medium text-foreground/80 hover:text-foreground sm:inline-flex">
+          <button
+            type="button"
+            onClick={onLogin}
+            className="hidden text-sm font-medium text-foreground/80 hover:text-foreground sm:inline-flex"
+          >
             Login
           </button>
-          <button className="inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:bg-secondary">
+          <button
+            type="button"
+            onClick={onCartOpen}
+            className="relative inline-flex items-center gap-2 rounded-full border border-border px-3 py-1.5 text-sm font-medium hover:bg-secondary"
+          >
             <ShoppingCart className="h-4 w-4" />
             Cart
+            {cartCount > 0 && (
+              <span className="ml-1 inline-flex h-5 min-w-[20px] items-center justify-center rounded-full bg-accent px-1 text-[11px] font-semibold text-accent-foreground">
+                {cartCount}
+              </span>
+            )}
           </button>
         </nav>
       </div>
@@ -202,14 +329,22 @@ function Header() {
   );
 }
 
-function Hero() {
+type HeroProps = {
+  city: string;
+  query: string;
+  setQuery: (v: string) => void;
+  onSearch: (e?: FormEvent) => void;
+  onChip: (chip: string) => void;
+};
+
+function Hero({ city, query, setQuery, onSearch, onChip }: HeroProps) {
   return (
     <section className="relative overflow-hidden" style={{ background: "var(--gradient-hero)" }}>
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-2 lg:gap-16 lg:px-8 lg:py-20">
         <div className="flex flex-col justify-center">
           <p className="mb-3 inline-flex w-fit items-center gap-2 rounded-full bg-background/70 px-3 py-1 text-xs font-medium text-foreground/70 shadow-sm">
             <span className="h-1.5 w-1.5 rounded-full bg-accent" />
-            Now serving across Kolkata
+            Now serving across {city}
           </p>
           <h1 className="text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl">
             Home services,
@@ -221,27 +356,37 @@ function Hero() {
             trained, all at fair, upfront prices.
           </p>
 
-          <div className="mt-8 flex items-center gap-2 rounded-2xl border border-border bg-background p-2 shadow-[var(--shadow-card)]">
+          <form
+            onSubmit={onSearch}
+            className="mt-8 flex items-center gap-2 rounded-2xl border border-border bg-background p-2 shadow-[var(--shadow-card)]"
+          >
             <div className="hidden items-center gap-2 border-r border-border pl-2 pr-3 text-sm text-foreground/80 sm:flex">
               <MapPin className="h-4 w-4 text-accent" />
-              Kolkata
+              {city}
             </div>
             <div className="flex flex-1 items-center gap-2 px-3">
               <Search className="h-5 w-5 text-muted-foreground" />
               <input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
                 className="w-full bg-transparent py-2 text-sm outline-none placeholder:text-muted-foreground sm:text-base"
                 placeholder="What are you looking for?"
               />
             </div>
-            <button className="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90">
+            <button
+              type="submit"
+              className="rounded-xl bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition hover:opacity-90"
+            >
               Search
             </button>
-          </div>
+          </form>
 
           <div className="mt-5 flex flex-wrap gap-2">
             {quickChips.map((c) => (
               <button
                 key={c}
+                type="button"
+                onClick={() => onChip(c)}
                 className="rounded-full border border-border bg-background/60 px-3 py-1.5 text-xs font-medium text-foreground/80 transition hover:border-accent hover:text-accent"
               >
                 {c}
@@ -295,9 +440,9 @@ function Hero() {
   );
 }
 
-function CategoryGrid() {
+function CategoryGrid({ onCategory }: { onCategory: (name: string) => void }) {
   return (
-    <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
+    <section id="categories" className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="mb-8 flex items-end justify-between gap-4">
         <div>
           <h2 className="text-2xl font-semibold tracking-tight sm:text-3xl">
@@ -307,17 +452,22 @@ function CategoryGrid() {
             Explore top service categories in Kolkata.
           </p>
         </div>
-        <a href="#" className="hidden text-sm font-medium text-accent hover:underline sm:inline">
+        <button
+          type="button"
+          onClick={() => onCategory("All categories")}
+          className="hidden text-sm font-medium text-accent hover:underline sm:inline"
+        >
           See all
-        </a>
+        </button>
       </div>
 
       <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
         {categories.map((c) => (
-          <a
+          <button
             key={c.name}
-            href="#"
-            className="group overflow-hidden rounded-2xl border border-border bg-card transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-hover)]"
+            type="button"
+            onClick={() => onCategory(c.name)}
+            className="group overflow-hidden rounded-2xl border border-border bg-card text-left transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-hover)]"
           >
             <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
               <img
@@ -333,16 +483,16 @@ function CategoryGrid() {
               <span className="text-sm font-medium">{c.name}</span>
               <ChevronRight className="h-4 w-4 text-muted-foreground transition group-hover:translate-x-0.5 group-hover:text-accent" />
             </div>
-          </a>
+          </button>
         ))}
       </div>
     </section>
   );
 }
 
-function PopularServices() {
+function PopularServices({ onAdd }: { onAdd: (name: string) => void }) {
   return (
-    <section className="bg-secondary/50 py-16">
+    <section id="popular" className="bg-secondary/50 py-16">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="mb-8 flex items-end justify-between gap-4">
           <div>
@@ -386,11 +536,13 @@ function PopularServices() {
                 <div className="mt-4 flex items-end justify-between">
                   <div>
                     <p className="text-base font-semibold">₹{s.price}</p>
-                    <p className="text-xs text-muted-foreground line-through">
-                      ₹{s.original}
-                    </p>
+                    <p className="text-xs text-muted-foreground line-through">₹{s.original}</p>
                   </div>
-                  <button className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:border-accent hover:text-accent">
+                  <button
+                    type="button"
+                    onClick={() => onAdd(s.name)}
+                    className="rounded-lg border border-border px-3 py-1.5 text-xs font-medium hover:border-accent hover:text-accent"
+                  >
                     Add
                   </button>
                 </div>
@@ -457,7 +609,7 @@ function Testimonials() {
   );
 }
 
-function AppCta() {
+function AppCta({ onDownload }: { onDownload: (store: "App Store" | "Google Play") => void }) {
   return (
     <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="overflow-hidden rounded-3xl bg-primary px-8 py-12 text-primary-foreground sm:px-12 sm:py-14">
@@ -474,18 +626,20 @@ function AppCta() {
               Manage bookings, chat with your expert, and pay securely — all from one app.
             </p>
             <div className="mt-6 flex flex-wrap gap-3">
-              <a
-                href="#"
+              <button
+                type="button"
+                onClick={() => onDownload("App Store")}
                 className="inline-flex items-center gap-2 rounded-xl bg-primary-foreground px-4 py-2.5 text-sm font-medium text-primary hover:opacity-90"
               >
                 App Store
-              </a>
-              <a
-                href="#"
+              </button>
+              <button
+                type="button"
+                onClick={() => onDownload("Google Play")}
                 className="inline-flex items-center gap-2 rounded-xl border border-primary-foreground/30 px-4 py-2.5 text-sm font-medium hover:bg-primary-foreground/10"
               >
                 Google Play
-              </a>
+              </button>
             </div>
           </div>
           <div className="hidden justify-end lg:flex">
@@ -514,25 +668,16 @@ function AppCta() {
   );
 }
 
-function Footer() {
-  const cols = [
-    {
-      title: "Company",
-      links: ["About us", "Careers", "Press", "Blog"],
-    },
-    {
-      title: "For customers",
-      links: ["Categories", "Reviews", "Help & Support", "Safety"],
-    },
-    {
-      title: "For professionals",
-      links: ["Register as a pro", "Partner login", "Training"],
-    },
-    {
-      title: "Cities",
-      links: ["Kolkata", "Delhi NCR", "Mumbai", "Bengaluru", "Hyderabad"],
-    },
-  ];
+function Footer({ onLink }: { onLink: (label: string) => void }) {
+  const cols = useMemo(
+    () => [
+      { title: "Company", links: ["About us", "Careers", "Press", "Blog"] },
+      { title: "For customers", links: ["Categories", "Reviews", "Help & Support", "Safety"] },
+      { title: "For professionals", links: ["Register as a pro", "Partner login", "Training"] },
+      { title: "Cities", links: ["Kolkata", "Delhi NCR", "Mumbai", "Bengaluru", "Hyderabad"] },
+    ],
+    [],
+  );
   return (
     <footer className="border-t border-border bg-background">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-14 sm:px-6 lg:grid-cols-5 lg:px-8">
@@ -553,9 +698,13 @@ function Footer() {
             <ul className="mt-3 space-y-2 text-sm text-muted-foreground">
               {col.links.map((l) => (
                 <li key={l}>
-                  <a href="#" className="hover:text-foreground">
+                  <button
+                    type="button"
+                    onClick={() => onLink(l)}
+                    className="hover:text-foreground"
+                  >
                     {l}
-                  </a>
+                  </button>
                 </li>
               ))}
             </ul>
@@ -566,15 +715,23 @@ function Footer() {
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:px-6 lg:px-8">
           <p>© {new Date().getFullYear()} All in One. All rights reserved.</p>
           <div className="flex gap-4">
-            <a href="#" className="hover:text-foreground">
+            <button type="button" onClick={() => onLink("Terms")} className="hover:text-foreground">
               Terms
-            </a>
-            <a href="#" className="hover:text-foreground">
+            </button>
+            <button
+              type="button"
+              onClick={() => onLink("Privacy")}
+              className="hover:text-foreground"
+            >
               Privacy
-            </a>
-            <a href="#" className="hover:text-foreground">
+            </button>
+            <button
+              type="button"
+              onClick={() => onLink("Contact")}
+              className="hover:text-foreground"
+            >
               Contact
-            </a>
+            </button>
           </div>
         </div>
       </div>
