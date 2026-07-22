@@ -541,7 +541,7 @@ function Footer() {
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary text-primary-foreground">
               <Sparkles className="h-5 w-5" />
             </div>
-            <span className="text-lg font-semibold tracking-tight">UrbanHelp</span>
+            <span className="text-lg font-semibold tracking-tight">All in One</span>
           </div>
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
             Home services at your doorstep. Trusted professionals across India.
@@ -564,7 +564,7 @@ function Footer() {
       </div>
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-2 px-4 py-6 text-xs text-muted-foreground sm:flex-row sm:px-6 lg:px-8">
-          <p>© {new Date().getFullYear()} UrbanHelp. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} All in One. All rights reserved.</p>
           <div className="flex gap-4">
             <a href="#" className="hover:text-foreground">
               Terms
