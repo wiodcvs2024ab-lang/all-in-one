@@ -73,16 +73,21 @@ function ServicesPage() {
         </div>
 
         {showSearch ? (
-          <div className="mt-10">
-            <h2 className="text-lg font-semibold">Results for "{q}"</h2>
-            {searchResults.isLoading && <p className="mt-4 text-sm text-muted-foreground">Searching...</p>}
-            {searchResults.data && searchResults.data.length === 0 && (
-              <p className="mt-4 text-sm text-muted-foreground">No services matched. Try a different search.</p>
-            )}
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {searchResults.data?.map((s) => (
-                <ServiceMiniCard key={s.id} service={s} />
-              ))}
+          <div className="mt-10 grid gap-6 lg:grid-cols-[260px_1fr]">
+            <ServiceFilters value={filters} onChange={setFilters} resultCount={filtered.length} />
+            <div>
+              <h2 className="text-lg font-semibold">Results for "{q}"</h2>
+              {searchResults.isLoading && <p className="mt-4 text-sm text-muted-foreground">Searching...</p>}
+              {searchResults.data && filtered.length === 0 && (
+                <p className="mt-4 text-sm text-muted-foreground">
+                  No services matched. Try a different search or relax your filters.
+                </p>
+              )}
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {filtered.map((s) => (
+                  <ServiceMiniCard key={s.id} service={s} />
+                ))}
+              </div>
             </div>
           </div>
         ) : (
