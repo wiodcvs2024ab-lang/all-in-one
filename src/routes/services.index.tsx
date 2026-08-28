@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Search, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { categoryImage } from "@/lib/category-images";
+import { ServiceFilters, applyFilters, defaultFilters, type Filters } from "@/components/site/ServiceFilters";
 
 export const Route = createFileRoute("/services/")({
   validateSearch: (s: Record<string, unknown>): { q?: string } => ({
@@ -24,6 +25,7 @@ export const Route = createFileRoute("/services/")({
 function ServicesPage() {
   const { q: initialQ } = useSearch({ from: "/services/" });
   const [q, setQ] = useState(initialQ ?? "");
+  const [filters, setFilters] = useState<Filters>(defaultFilters);
 
   const cats = useQuery({
     queryKey: ["categories"],
@@ -38,17 +40,22 @@ function ServicesPage() {
     queryKey: ["service-search", q],
     enabled: q.trim().length > 0,
     queryFn: async () => {
+      const term = q.trim();
       const { data, error } = await supabase
         .from("services")
         .select("*, categories(slug, name)")
-        .ilike("name", `%${q}%`)
-        .limit(24);
+        .or(`name.ilike.%${term}%,description.ilike.%${term}%`)
+        .limit(60);
       if (error) throw error;
       return data;
     },
   });
 
   const showSearch = q.trim().length > 0;
+  const filtered = useMemo(
+    () => applyFilters(searchResults.data ?? [], filters),
+    [searchResults.data, filters],
+  );
 
   return (
     <SiteLayout>
@@ -68,16 +75,21 @@ function ServicesPage() {
         </div>
 
         {showSearch ? (
-          <div className="mt-10">
-            <h2 className="text-lg font-semibold">Results for "{q}"</h2>
-            {searchResults.isLoading && <p className="mt-4 text-sm text-muted-foreground">Searching...</p>}
-            {searchResults.data && searchResults.data.length === 0 && (
-              <p className="mt-4 text-sm text-muted-foreground">No services matched. Try a different search.</p>
-            )}
-            <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {searchResults.data?.map((s) => (
-                <ServiceMiniCard key={s.id} service={s} />
-              ))}
+          <div className="mt-10 grid gap-6 lg:grid-cols-[260px_1fr]">
+            <ServiceFilters value={filters} onChange={setFilters} resultCount={filtered.length} />
+            <div>
+              <h2 className="text-lg font-semibold">Results for "{q}"</h2>
+              {searchResults.isLoading && <p className="mt-4 text-sm text-muted-foreground">Searching...</p>}
+              {searchResults.data && filtered.length === 0 && (
+                <p className="mt-4 text-sm text-muted-foreground">
+                  No services matched. Try a different search or relax your filters.
+                </p>
+              )}
+              <div className="mt-4 grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+                {filtered.map((s) => (
+                  <ServiceMiniCard key={s.id} service={s} />
+                ))}
+              </div>
             </div>
           </div>
         ) : (
