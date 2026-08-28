@@ -26,6 +26,8 @@ function titleize(s: string) {
 function CategoryPage() {
   const { category } = Route.useParams();
   const { add } = useCart();
+  const [filters, setFilters] = useState<Filters>(defaultFilters);
+
 
   const q = useQuery({
     queryKey: ["category", category],
