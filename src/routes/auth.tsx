@@ -8,7 +8,7 @@ import { toast } from "sonner";
 import { Sparkles } from "lucide-react";
 
 export const Route = createFileRoute("/auth")({
-  validateSearch: (s: Record<string, unknown>) => ({
+  validateSearch: (s: Record<string, unknown>): { redirect?: string } => ({
     redirect: typeof s.redirect === "string" ? s.redirect : undefined,
   }),
   head: () => ({

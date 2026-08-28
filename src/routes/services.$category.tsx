@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Star, Clock, ChevronLeft, Plus } from "lucide-react";
 import { useCart } from "@/lib/cart";
+import { categoryImage } from "@/lib/category-images";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/services/$category")({
@@ -59,7 +60,13 @@ function CategoryPage() {
               {q.data.services.map((s) => (
                 <article key={s.id} className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition hover:shadow-[var(--shadow-hover)]">
                   <Link to="/service/$id" params={{ id: s.id }} className="aspect-[4/3] overflow-hidden bg-muted">
-                    {s.image_url && <img src={s.image_url} alt={s.name} loading="lazy" className="h-full w-full object-cover transition duration-500 hover:scale-105" />}
+                    <img
+                      src={s.image_url || categoryImage(category)}
+                      alt={s.name}
+                      loading="lazy"
+                      onError={(e) => { (e.currentTarget as HTMLImageElement).src = categoryImage(category); }}
+                      className="h-full w-full object-cover transition duration-500 hover:scale-105"
+                    />
                   </Link>
                   <div className="flex flex-1 flex-col p-4">
                     {s.tag && <span className="mb-2 w-fit rounded-full bg-accent/10 px-2 py-0.5 text-[11px] font-medium text-accent">{s.tag}</span>}
