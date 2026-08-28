@@ -7,8 +7,8 @@ import { useState } from "react";
 import { categoryImage } from "@/lib/category-images";
 
 export const Route = createFileRoute("/services/")({
-  validateSearch: (s: Record<string, unknown>) => ({
-    q: typeof s.q === "string" ? s.q : "",
+  validateSearch: (s: Record<string, unknown>): { q?: string } => ({
+    q: typeof s.q === "string" ? s.q : undefined,
   }),
   head: () => ({
     meta: [
