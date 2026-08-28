@@ -25,6 +25,7 @@ export const Route = createFileRoute("/services/")({
 function ServicesPage() {
   const { q: initialQ } = useSearch({ from: "/services/" });
   const [q, setQ] = useState(initialQ ?? "");
+  const [filters, setFilters] = useState<Filters>(defaultFilters);
 
   const cats = useQuery({
     queryKey: ["categories"],
