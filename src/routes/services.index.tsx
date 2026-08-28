@@ -92,9 +92,12 @@ function ServicesPage() {
                 className="group overflow-hidden rounded-2xl border border-border bg-card text-left transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-hover)]"
               >
                 <div className="aspect-[4/3] w-full overflow-hidden bg-muted">
-                  {c.image_url && (
-                    <img src={c.image_url} alt={c.name} loading="lazy" className="h-full w-full object-cover transition duration-500 group-hover:scale-105" />
-                  )}
+                  <img
+                    src={categoryImage(c.slug, c.image_url)}
+                    alt={c.name}
+                    loading="lazy"
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
                 </div>
                 <div className="flex items-center justify-between p-4">
                   <span className="text-sm font-medium">{c.name}</span>
