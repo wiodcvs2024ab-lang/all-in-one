@@ -5,6 +5,8 @@ import { SiteLayout } from "@/components/site/SiteLayout";
 import { Star, Clock, ChevronLeft, Plus } from "lucide-react";
 import { useCart } from "@/lib/cart";
 import { categoryImage } from "@/lib/category-images";
+import { useState, useMemo } from "react";
+import { ServiceFilters, applyFilters, defaultFilters, type Filters } from "@/components/site/ServiceFilters";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/services/$category")({
