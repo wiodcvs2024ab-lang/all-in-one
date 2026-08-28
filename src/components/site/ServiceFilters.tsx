@@ -106,7 +106,7 @@ export function ServiceFilters({
           step={100}
           value={value.maxPrice}
           onChange={(e) => set({ maxPrice: Number(e.target.value) })}
-          className="mt-3 w-full accent-[hsl(var(--accent))]"
+          className="mt-3 w-full accent-[var(--accent)]"
           aria-label="Maximum price"
         />
         <div className="mt-3 flex items-center gap-2">
@@ -161,7 +161,7 @@ export function ServiceFilters({
                 name="duration"
                 checked={value.maxDuration === d.value}
                 onChange={() => set({ maxDuration: d.value })}
-                className="accent-[hsl(var(--accent))]"
+                className="accent-[var(--accent)]"
               />
               {d.label}
             </label>
