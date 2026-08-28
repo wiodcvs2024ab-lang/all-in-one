@@ -3,8 +3,9 @@ import { useQuery } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Search, ChevronRight } from "lucide-react";
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { categoryImage } from "@/lib/category-images";
+import { ServiceFilters, applyFilters, defaultFilters, type Filters } from "@/components/site/ServiceFilters";
 
 export const Route = createFileRoute("/services/")({
   validateSearch: (s: Record<string, unknown>): { q?: string } => ({
