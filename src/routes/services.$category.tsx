@@ -4,6 +4,7 @@ import { supabase } from "@/integrations/supabase/client";
 import { SiteLayout } from "@/components/site/SiteLayout";
 import { Star, Clock, ChevronLeft, Plus } from "lucide-react";
 import { useCart } from "@/lib/cart";
+import { categoryImage } from "@/lib/category-images";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/services/$category")({
