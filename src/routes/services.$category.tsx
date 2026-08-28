@@ -56,8 +56,13 @@ function CategoryPage() {
               </div>
             </div>
 
-            <div className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {q.data.services.map((s) => (
+            <div className="mt-8 grid gap-6 lg:grid-cols-[260px_1fr]">
+            <ServiceFilters value={filters} onChange={setFilters} resultCount={filtered.length} />
+            <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+              {filtered.length === 0 && (
+                <p className="text-sm text-muted-foreground">No services match your filters.</p>
+              )}
+              {filtered.map((s) => (
                 <article key={s.id} className="flex flex-col overflow-hidden rounded-2xl border border-border bg-card transition hover:shadow-[var(--shadow-hover)]">
                   <Link to="/service/$id" params={{ id: s.id }} className="aspect-[4/3] overflow-hidden bg-muted">
                     <img
