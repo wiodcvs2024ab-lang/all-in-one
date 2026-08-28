@@ -38,17 +38,22 @@ function ServicesPage() {
     queryKey: ["service-search", q],
     enabled: q.trim().length > 0,
     queryFn: async () => {
+      const term = q.trim();
       const { data, error } = await supabase
         .from("services")
         .select("*, categories(slug, name)")
-        .ilike("name", `%${q}%`)
-        .limit(24);
+        .or(`name.ilike.%${term}%,description.ilike.%${term}%`)
+        .limit(60);
       if (error) throw error;
       return data;
     },
   });
 
   const showSearch = q.trim().length > 0;
+  const filtered = useMemo(
+    () => applyFilters(searchResults.data ?? [], filters),
+    [searchResults.data, filters],
+  );
 
   return (
     <SiteLayout>
