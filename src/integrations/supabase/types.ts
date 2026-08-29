@@ -61,36 +61,59 @@ export type Database = {
           address: string
           city: string
           created_at: string
+          duration_min: number
           id: string
           notes: string | null
+          payment_ref: string | null
+          payment_status: string
+          pro_id: string | null
           slot_at: string
           status: string
           subtotal: number
+          updated_at: string
           user_id: string
         }
         Insert: {
           address: string
           city: string
           created_at?: string
+          duration_min?: number
           id?: string
           notes?: string | null
+          payment_ref?: string | null
+          payment_status?: string
+          pro_id?: string | null
           slot_at: string
           status?: string
           subtotal?: number
+          updated_at?: string
           user_id: string
         }
         Update: {
           address?: string
           city?: string
           created_at?: string
+          duration_min?: number
           id?: string
           notes?: string | null
+          payment_ref?: string | null
+          payment_status?: string
+          pro_id?: string | null
           slot_at?: string
           status?: string
           subtotal?: number
+          updated_at?: string
           user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "bookings_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "pros"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       cart_items: {
         Row: {
@@ -178,6 +201,38 @@ export type Database = {
         }
         Relationships: []
       }
+      email_log: {
+        Row: {
+          booking_id: string | null
+          id: string
+          kind: string
+          recipient: string
+          sent_at: string
+        }
+        Insert: {
+          booking_id?: string | null
+          id?: string
+          kind: string
+          recipient: string
+          sent_at?: string
+        }
+        Update: {
+          booking_id?: string | null
+          id?: string
+          kind?: string
+          recipient?: string
+          sent_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "email_log_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       pro_applications: {
         Row: {
           city: string
@@ -188,6 +243,7 @@ export type Database = {
           name: string
           phone: string
           skills: string
+          status: string
         }
         Insert: {
           city: string
@@ -198,6 +254,7 @@ export type Database = {
           name: string
           phone: string
           skills: string
+          status?: string
         }
         Update: {
           city?: string
@@ -208,8 +265,112 @@ export type Database = {
           name?: string
           phone?: string
           skills?: string
+          status?: string
         }
         Relationships: []
+      }
+      pro_availability: {
+        Row: {
+          created_at: string
+          end_min: number
+          id: string
+          pro_id: string
+          start_min: number
+          weekday: number
+        }
+        Insert: {
+          created_at?: string
+          end_min: number
+          id?: string
+          pro_id: string
+          start_min: number
+          weekday: number
+        }
+        Update: {
+          created_at?: string
+          end_min?: number
+          id?: string
+          pro_id?: string
+          start_min?: number
+          weekday?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_availability_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "pros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pro_categories: {
+        Row: {
+          category_id: string
+          id: string
+          pro_id: string
+        }
+        Insert: {
+          category_id: string
+          id?: string
+          pro_id: string
+        }
+        Update: {
+          category_id?: string
+          id?: string
+          pro_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_categories_category_id_fkey"
+            columns: ["category_id"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "pro_categories_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "pros"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      pro_time_off: {
+        Row: {
+          created_at: string
+          ends_at: string
+          id: string
+          pro_id: string
+          reason: string | null
+          starts_at: string
+        }
+        Insert: {
+          created_at?: string
+          ends_at: string
+          id?: string
+          pro_id: string
+          reason?: string | null
+          starts_at: string
+        }
+        Update: {
+          created_at?: string
+          ends_at?: string
+          id?: string
+          pro_id?: string
+          reason?: string | null
+          starts_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "pro_time_off_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "pros"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       profiles: {
         Row: {
@@ -234,6 +395,118 @@ export type Database = {
           phone?: string | null
         }
         Relationships: []
+      }
+      pros: {
+        Row: {
+          active: boolean
+          bio: string | null
+          city: string
+          created_at: string
+          email: string
+          experience_years: number
+          id: string
+          name: string
+          phone: string | null
+          rating: number
+          skills: string | null
+          updated_at: string
+          user_id: string | null
+        }
+        Insert: {
+          active?: boolean
+          bio?: string | null
+          city: string
+          created_at?: string
+          email: string
+          experience_years?: number
+          id?: string
+          name: string
+          phone?: string | null
+          rating?: number
+          skills?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Update: {
+          active?: boolean
+          bio?: string | null
+          city?: string
+          created_at?: string
+          email?: string
+          experience_years?: number
+          id?: string
+          name?: string
+          phone?: string | null
+          rating?: number
+          skills?: string | null
+          updated_at?: string
+          user_id?: string | null
+        }
+        Relationships: []
+      }
+      reviews: {
+        Row: {
+          author_name: string | null
+          booking_id: string | null
+          comment: string | null
+          created_at: string
+          hidden: boolean
+          id: string
+          pro_id: string | null
+          rating: number
+          service_id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          author_name?: string | null
+          booking_id?: string | null
+          comment?: string | null
+          created_at?: string
+          hidden?: boolean
+          id?: string
+          pro_id?: string | null
+          rating: number
+          service_id: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          author_name?: string | null
+          booking_id?: string | null
+          comment?: string | null
+          created_at?: string
+          hidden?: boolean
+          id?: string
+          pro_id?: string | null
+          rating?: number
+          service_id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reviews_booking_id_fkey"
+            columns: ["booking_id"]
+            isOneToOne: false
+            referencedRelation: "bookings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_pro_id_fkey"
+            columns: ["pro_id"]
+            isOneToOne: false
+            referencedRelation: "pros"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reviews_service_id_fkey"
+            columns: ["service_id"]
+            isOneToOne: false
+            referencedRelation: "services"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       services: {
         Row: {
