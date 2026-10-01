@@ -107,7 +107,7 @@ function BookingsTab() {
   });
 
   async function update(id: string, patch: Record<string, unknown>) {
-    const { error } = await supabase.from("bookings").update(patch).eq("id", id);
+    const { error } = await supabase.from("bookings").update(patch as never).eq("id", id);
     if (error) return toast.error(error.message);
     toast.success("Booking updated");
     qc.invalidateQueries({ queryKey: ["admin-bookings"] });
@@ -293,7 +293,7 @@ function CategoriesTab() {
   }
 
   async function save(id: string, patch: Record<string, unknown>) {
-    const { error } = await supabase.from("categories").update(patch).eq("id", id);
+    const { error } = await supabase.from("categories").update(patch as never).eq("id", id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["admin-cats"] });
   }
@@ -398,7 +398,7 @@ function ServicesTab() {
   }
 
   async function save(id: string, patch: Record<string, unknown>) {
-    const { error } = await supabase.from("services").update(patch).eq("id", id);
+    const { error } = await supabase.from("services").update(patch as never).eq("id", id);
     if (error) return toast.error(error.message);
     qc.invalidateQueries({ queryKey: ["admin-services"] });
   }
