@@ -3,6 +3,7 @@ import { MapPin, Search, ShoppingCart, Sparkles, User as UserIcon, LogOut } from
 import { useState, type FormEvent } from "react";
 import { useAuth } from "@/lib/auth";
 import { useCart } from "@/lib/cart";
+import { useRoles } from "@/lib/roles";
 import { toast } from "sonner";
 import {
   DropdownMenu,
@@ -17,6 +18,7 @@ const cities = ["Kolkata", "Delhi NCR", "Mumbai", "Bengaluru", "Hyderabad", "Pun
 export function Header() {
   const { user, signOut } = useAuth();
   const { count } = useCart();
+  const { isAdmin, isPro } = useRoles();
   const navigate = useNavigate();
   const [city, setCity] = useState("Kolkata");
   const [q, setQ] = useState("");
@@ -91,6 +93,17 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link to="/cart">Cart</Link>
                 </DropdownMenuItem>
+                {(isPro || isAdmin) && <DropdownMenuSeparator />}
+                {isPro && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/pro">Pro portal</Link>
+                  </DropdownMenuItem>
+                )}
+                {isAdmin && (
+                  <DropdownMenuItem asChild>
+                    <Link to="/admin">Admin</Link>
+                  </DropdownMenuItem>
+                )}
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={async () => {
