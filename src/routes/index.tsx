@@ -15,6 +15,7 @@ import { useNavigate } from "@tanstack/react-router";
 
 import heroImg from "@/assets/hero-salon.jpg";
 import { SiteLayout } from "@/components/site/SiteLayout";
+import { AiRecommender } from "@/components/site/AiRecommender";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -151,6 +152,7 @@ function Index() {
       </section>
 
       {/* CTA to services page */}
+      <AiRecommender />
       <section className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-col items-start justify-between gap-4 sm:flex-row sm:items-end">
           <div>
