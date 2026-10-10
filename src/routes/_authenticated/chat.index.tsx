@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/lib/auth";
 import { SiteLayout } from "@/components/site/SiteLayout";
 
 export const Route = createFileRoute("/_authenticated/chat/")({
