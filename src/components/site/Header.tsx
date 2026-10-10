@@ -93,6 +93,9 @@ export function Header() {
                 <DropdownMenuItem asChild>
                   <Link to="/cart">Cart</Link>
                 </DropdownMenuItem>
+                <DropdownMenuItem asChild>
+                  <Link to="/chat">AI assistant</Link>
+                </DropdownMenuItem>
                 {(isPro || isAdmin) && <DropdownMenuSeparator />}
                 {isPro && (
                   <DropdownMenuItem asChild>
