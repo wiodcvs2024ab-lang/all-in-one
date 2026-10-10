@@ -21,6 +21,7 @@ import { Route as AuthenticatedAdminRouteImport } from './routes/_authenticated/
 import { Route as AuthenticatedBookingsRouteImport } from './routes/_authenticated/bookings'
 import { Route as AuthenticatedCheckoutRouteImport } from './routes/_authenticated/checkout'
 import { Route as AuthenticatedProRouteImport } from './routes/_authenticated/pro'
+import { Route as ApiChatRouteImport } from './routes/api/chat'
 import { Route as ServiceIdRouteImport } from './routes/service.$id'
 import { Route as ServicesIndexRouteImport } from './routes/services.index'
 import { Route as ServicesCategoryRouteImport } from './routes/services.$category'
@@ -84,6 +85,11 @@ const AuthenticatedProRoute = AuthenticatedProRouteImport.update({
   path: '/pro',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const ApiChatRoute = ApiChatRouteImport.update({
+  id: '/api/chat',
+  path: '/api/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ServiceIdRoute = ServiceIdRouteImport.update({
   id: '/service/$id',
   path: '/service/$id',
@@ -112,6 +118,7 @@ export interface FileRoutesByFullPath {
   '/bookings': typeof AuthenticatedBookingsRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/pro': typeof AuthenticatedProRoute
+  '/api/chat': typeof ApiChatRoute
   '/service/$id': typeof ServiceIdRoute
   '/services/$category': typeof ServicesCategoryRoute
   '/services/': typeof ServicesIndexRoute
@@ -128,6 +135,7 @@ export interface FileRoutesByTo {
   '/bookings': typeof AuthenticatedBookingsRoute
   '/checkout': typeof AuthenticatedCheckoutRoute
   '/pro': typeof AuthenticatedProRoute
+  '/api/chat': typeof ApiChatRoute
   '/service/$id': typeof ServiceIdRoute
   '/services/$category': typeof ServicesCategoryRoute
   '/services': typeof ServicesIndexRoute
@@ -146,6 +154,7 @@ export interface FileRoutesById {
   '/_authenticated/bookings': typeof AuthenticatedBookingsRoute
   '/_authenticated/checkout': typeof AuthenticatedCheckoutRoute
   '/_authenticated/pro': typeof AuthenticatedProRoute
+  '/api/chat': typeof ApiChatRoute
   '/service/$id': typeof ServiceIdRoute
   '/services/$category': typeof ServicesCategoryRoute
   '/services/': typeof ServicesIndexRoute
@@ -164,6 +173,7 @@ export interface FileRouteTypes {
     | '/bookings'
     | '/checkout'
     | '/pro'
+    | '/api/chat'
     | '/service/$id'
     | '/services/$category'
     | '/services/'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/bookings'
     | '/checkout'
     | '/pro'
+    | '/api/chat'
     | '/service/$id'
     | '/services/$category'
     | '/services'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/_authenticated/bookings'
     | '/_authenticated/checkout'
     | '/_authenticated/pro'
+    | '/api/chat'
     | '/service/$id'
     | '/services/$category'
     | '/services/'
@@ -211,6 +223,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   HelpRoute: typeof HelpRoute
   ProsRoute: typeof ProsRoute
+  ApiChatRoute: typeof ApiChatRoute
   ServiceIdRoute: typeof ServiceIdRoute
   ServicesCategoryRoute: typeof ServicesCategoryRoute
   ServicesIndexRoute: typeof ServicesIndexRoute
@@ -302,6 +315,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedProRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/api/chat': {
+      id: '/api/chat'
+      path: '/api/chat'
+      fullPath: '/api/chat'
+      preLoaderRoute: typeof ApiChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/service/$id': {
       id: '/service/$id'
       path: '/service/$id'
@@ -352,6 +372,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   HelpRoute: HelpRoute,
   ProsRoute: ProsRoute,
+  ApiChatRoute: ApiChatRoute,
   ServiceIdRoute: ServiceIdRoute,
   ServicesCategoryRoute: ServicesCategoryRoute,
   ServicesIndexRoute: ServicesIndexRoute,
