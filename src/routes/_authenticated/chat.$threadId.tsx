@@ -45,7 +45,6 @@ function ChatThread({ threadId }: { threadId: string }) {
   const [threads, setThreads] = useState<Thread[]>([]);
   const [initialMessages, setInitialMessages] = useState<UIMessage[] | null>(null);
   const [loadError, setLoadError] = useState("");
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
 
   useEffect(() => {
     let cancelled = false;
@@ -62,7 +61,6 @@ function ChatThread({ threadId }: { threadId: string }) {
       setThreads((threadRows as Thread[]) ?? []);
       if (error) {
         setLoadError("Couldn't load this conversation.");
-        setInitialMessages([]);
         return;
       }
       setInitialMessages(
@@ -77,32 +75,6 @@ function ChatThread({ threadId }: { threadId: string }) {
       cancelled = true;
     };
   }, [threadId]);
-
-  const transport = useMemo(
-    () =>
-      new DefaultChatTransport({
-        api: "/api/chat",
-        body: { threadId },
-        headers: async () => {
-          const { data } = await supabase.auth.getSession();
-          return { Authorization: `Bearer ${data.session?.access_token ?? ""}` };
-        },
-      }),
-    [threadId],
-  );
-
-  const { messages, sendMessage, status, stop, error } = useChat({
-    id: threadId,
-    transport,
-    messages: initialMessages ?? [],
-    onError: (e) => toast.error(e.message || "Something went wrong"),
-  });
-
-  const busy = status === "submitted" || status === "streaming";
-
-  useEffect(() => {
-    textareaRef.current?.focus();
-  }, [threadId, status]);
 
   async function newChat() {
     if (!user) return;
@@ -138,12 +110,6 @@ function ChatThread({ threadId }: { threadId: string }) {
         if (data) navigate({ to: "/chat/$threadId", params: { threadId: data.id } });
       }
     }
-  }
-
-  function onSubmit(message: PromptInputMessage) {
-    const text = message.text.trim();
-    if (!text || busy) return;
-    sendMessage({ text });
   }
 
   return (
@@ -205,89 +171,131 @@ function ChatThread({ threadId }: { threadId: string }) {
               {loadError || "Loading conversation…"}
             </div>
           ) : (
-            <Conversation className="flex-1">
-              <ConversationContent className="gap-6 px-5 py-6">
-                {messages.length === 0 && (
-                  <ConversationEmptyState
-                    title="Hi, I'm Aio"
-                    description="Ask me anything — help picking a service, home-care tips, or how booking works."
-                  />
-                )}
-                {messages.map((m, i) => (
-                  <Message key={m.id} from={m.role}>
-                    {m.role === "assistant" && (
-                      <img
-                        src={assistantAvatar}
-                        alt=""
-                        width={28}
-                        height={28}
-                        className="mt-1 h-7 w-7 shrink-0 rounded-md"
-                      />
-                    )}
-                    <MessageContent
-                      className={
-                        m.role === "user"
-                          ? "rounded-2xl bg-primary px-4 py-2.5 text-primary-foreground"
-                          : "flex-1"
-                      }
-                    >
-                      {m.parts.map((part, pi) =>
-                        part.type === "text" ? (
-                          m.role === "assistant" ? (
-                            <MessageResponse key={pi}>{part.text}</MessageResponse>
-                          ) : (
-                            <p key={pi} className="whitespace-pre-wrap text-sm">
-                              {part.text}
-                            </p>
-                          )
-                        ) : null,
-                      )}
-                      {m.role === "assistant" &&
-                        status === "submitted" &&
-                        i === messages.length - 1 && <Shimmer>Thinking…</Shimmer>}
-                    </MessageContent>
-                  </Message>
-                ))}
-                {status === "submitted" && messages[messages.length - 1]?.role === "user" && (
-                  <Message from="assistant">
-                    <img
-                      src={assistantAvatar}
-                      alt=""
-                      width={28}
-                      height={28}
-                      className="mt-1 h-7 w-7 shrink-0 rounded-md"
-                    />
-                    <MessageContent className="flex-1">
-                      <Shimmer>Thinking…</Shimmer>
-                    </MessageContent>
-                  </Message>
-                )}
-              </ConversationContent>
-              <ConversationScrollButton />
-            </Conversation>
+            <ChatPanel threadId={threadId} initialMessages={initialMessages} />
           )}
-
-          {error && (
-            <p className="border-t border-border px-5 py-2 text-xs text-destructive">
-              {error.message || "Something went wrong. Please try again."}
-            </p>
-          )}
-
-          <div className="border-t border-border p-3">
-            <PromptInput onSubmit={onSubmit} className="rounded-xl border border-border bg-background">
-              <PromptInputTextarea
-                ref={textareaRef}
-                placeholder="Ask Aio anything…"
-                disabled={busy}
-                className="min-h-[52px]"
-              />
-              <PromptInputFooter className="justify-end p-2">
-                <PromptInputSubmit status={status} onStop={stop} disabled={!busy && false} />
-              </PromptInputFooter>
-            </PromptInput>
-          </div>
         </section>
       </div>
     </SiteLayout>
+  );
+}
+
+function ChatPanel({ threadId, initialMessages }: { threadId: string; initialMessages: UIMessage[] }) {
+  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+
+  const transport = useMemo(
+    () =>
+      new DefaultChatTransport({
+        api: "/api/chat",
+        body: { threadId },
+        headers: async () => {
+          const { data } = await supabase.auth.getSession();
+          return { Authorization: `Bearer ${data.session?.access_token ?? ""}` };
+        },
+      }),
+    [threadId],
+  );
+
+  const { messages, sendMessage, status, stop, error } = useChat({
+    id: threadId,
+    transport,
+    messages: initialMessages,
+    onError: (e) => toast.error(e.message || "Something went wrong"),
+  });
+
+  const busy = status === "submitted" || status === "streaming";
+
+  useEffect(() => {
+    textareaRef.current?.focus();
+  }, [threadId, status]);
+
+  function onSubmit(message: PromptInputMessage) {
+    const text = message.text.trim();
+    if (!text || busy) return;
+    sendMessage({ text });
+  }
+
+  return (
+    <>
+      <Conversation className="flex-1">
+        <ConversationContent className="gap-6 px-5 py-6">
+          {messages.length === 0 && (
+            <ConversationEmptyState
+              title="Hi, I'm Aio"
+              description="Ask me anything — help picking a service, home-care tips, or how booking works."
+            />
+          )}
+          {messages.map((m, i) => (
+            <Message key={m.id} from={m.role}>
+              {m.role === "assistant" && (
+                <img
+                  src={assistantAvatar}
+                  alt=""
+                  width={28}
+                  height={28}
+                  className="mt-1 h-7 w-7 shrink-0 rounded-md"
+                />
+              )}
+              <MessageContent
+                className={
+                  m.role === "user"
+                    ? "rounded-2xl bg-primary px-4 py-2.5 text-primary-foreground"
+                    : "flex-1"
+                }
+              >
+                {m.parts.map((part, pi) =>
+                  part.type === "text" ? (
+                    m.role === "assistant" ? (
+                      <MessageResponse key={pi}>{part.text}</MessageResponse>
+                    ) : (
+                      <p key={pi} className="whitespace-pre-wrap text-sm">
+                        {part.text}
+                      </p>
+                    )
+                  ) : null,
+                )}
+                {m.role === "assistant" && status === "submitted" && i === messages.length - 1 && (
+                  <Shimmer>Thinking…</Shimmer>
+                )}
+              </MessageContent>
+            </Message>
+          ))}
+          {status === "submitted" && messages[messages.length - 1]?.role === "user" && (
+            <Message from="assistant">
+              <img
+                src={assistantAvatar}
+                alt=""
+                width={28}
+                height={28}
+                className="mt-1 h-7 w-7 shrink-0 rounded-md"
+              />
+              <MessageContent className="flex-1">
+                <Shimmer>Thinking…</Shimmer>
+              </MessageContent>
+            </Message>
+          )}
+        </ConversationContent>
+        <ConversationScrollButton />
+      </Conversation>
+
+      {error && (
+        <p className="border-t border-border px-5 py-2 text-xs text-destructive">
+          {error.message || "Something went wrong. Please try again."}
+        </p>
+      )}
+
+      <div className="border-t border-border p-3">
+        <PromptInput onSubmit={onSubmit} className="rounded-xl border border-border bg-background">
+          <PromptInputTextarea
+            ref={textareaRef}
+            placeholder="Ask Aio anything…"
+            disabled={busy}
+            className="min-h-[52px]"
+          />
+          <PromptInputFooter className="justify-end p-2">
+            <PromptInputSubmit status={status} onStop={stop} />
+          </PromptInputFooter>
+        </PromptInput>
+      </div>
+    </>
   );
 }
