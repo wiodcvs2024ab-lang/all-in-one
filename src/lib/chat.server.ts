@@ -87,6 +87,7 @@ export async function handleChat(request: Request): Promise<Response> {
     originalMessages: messages,
     sendReasoning: true,
     onFinish: async ({ messages: all }) => {
+      console.log("[chat] onFinish, messages:", all.length);
       try {
         const { error: delError } = await supabase
           .from("chat_messages")
@@ -104,9 +105,11 @@ export async function handleChat(request: Request): Promise<Response> {
             role: m.role,
             parts: m.parts,
           }));
+        console.log("[chat] inserting rows:", rows.length);
         if (rows.length) {
           const { error: insError } = await supabase.from("chat_messages").insert(rows);
           if (insError) console.error("chat_messages insert failed", insError.message);
+          else console.log("[chat] insert ok");
         }
         const firstUser = all.find((m) => m.role === "user");
         const firstText =
