@@ -41,6 +41,7 @@ function ChatThreadPage() {
 
 function ChatThread({ threadId }: { threadId: string }) {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const [threads, setThreads] = useState<Thread[]>([]);
   const [initialMessages, setInitialMessages] = useState<UIMessage[] | null>(null);
   const [loadError, setLoadError] = useState("");
@@ -104,9 +105,10 @@ function ChatThread({ threadId }: { threadId: string }) {
   }, [threadId, status]);
 
   async function newChat() {
+    if (!user) return;
     const { data, error: err } = await supabase
       .from("chat_threads")
-      .insert({ title: "New conversation" })
+      .insert({ title: "New conversation", user_id: user.id })
       .select("id")
       .single();
     if (err || !data) {
@@ -130,7 +132,7 @@ function ChatThread({ threadId }: { threadId: string }) {
       } else {
         const { data } = await supabase
           .from("chat_threads")
-          .insert({ title: "New conversation" })
+          .insert({ title: "New conversation", user_id: user!.id })
           .select("id")
           .single();
         if (data) navigate({ to: "/chat/$threadId", params: { threadId: data.id } });

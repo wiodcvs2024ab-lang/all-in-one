@@ -13,6 +13,7 @@ export const Route = createFileRoute("/_authenticated/chat/")({
 
 function ChatIndex() {
   const navigate = useNavigate();
+  const { user } = useAuth();
   const started = useRef(false);
 
   useEffect(() => {
@@ -28,9 +29,10 @@ function ChatIndex() {
         navigate({ to: "/chat/$threadId", params: { threadId: threads[0].id }, replace: true });
         return;
       }
+      if (!user) return;
       const { data: created, error } = await supabase
         .from("chat_threads")
-        .insert({ title: "New conversation" })
+        .insert({ title: "New conversation", user_id: user.id })
         .select("id")
         .single();
       if (error || !created) {
@@ -39,7 +41,7 @@ function ChatIndex() {
       }
       navigate({ to: "/chat/$threadId", params: { threadId: created.id }, replace: true });
     })();
-  }, [navigate]);
+  }, [navigate, user]);
 
   return (
     <SiteLayout>
